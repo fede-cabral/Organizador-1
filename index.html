@@ -15,6 +15,7 @@
             --ok: #15803d;
             --aviso: #b45309;
             --info: #0369a1;
+            --gedo: #4f46e5;
         }
 
         * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -35,12 +36,14 @@
         .input-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px;}
         .input-group input, .input-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 15px;}
         
-        .btn { width: 100%; padding: 12px; background: var(--verde-militar); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn { width: 100%; padding: 10px 15px; background: var(--verde-militar); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn:hover { background: var(--verde-oscuro); }
         .btn-danger { background: var(--alerta); }
         .btn-danger:hover { background: #991b1b; }
         .btn-info { background: var(--info); }
         .btn-info:hover { background: #075985; }
+        .btn-gedo { background: var(--gedo); }
+        .btn-gedo:hover { background: #3730a3; }
 
         /* Estructura Principal */
         #app-screen { display: none; }
@@ -49,7 +52,7 @@
         .user-info { display: flex; align-items: center; gap: 15px; }
         .logout-btn { background: #ef4444; border: none; color: white; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;}
 
-        .container { max-width: 1300px; margin: 20px auto; padding: 0 20px; }
+        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
         .module-view { display: none; animation: fadeIn 0.3s ease-in-out; }
         .module-view.active { display: block; }
 
@@ -75,11 +78,12 @@
         tbody tr:hover { background-color: #f8fafc; }
         
         /* Badges e Indicadores */
-        .badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; display: inline-block; }
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; display: inline-block; text-align: center; }
         .bg-rojo { background-color: var(--alerta); }
         .bg-verde { background-color: var(--ok); }
         .bg-amarillo { background-color: var(--aviso); }
         .bg-azul { background-color: var(--info); }
+        .bg-violeta { background-color: var(--gedo); }
 
         .orden-card { background: #fffbeb; border-left: 4px solid var(--aviso); padding: 15px; margin-bottom: 15px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .orden-fecha { font-size: 12px; color: #64748b; margin-bottom: 8px; font-weight: 600;}
@@ -89,10 +93,15 @@
         .feed-time { font-size: 11px; color: #64748b; font-weight: bold; min-width: 120px; }
 
         .toast { position: fixed; bottom: 20px; right: 20px; background: var(--verde-oscuro); color: white; padding: 15px 25px; border-radius: 4px; display: none; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); z-index: 1000; font-weight: bold; }
+
+        /* Pestañas Internas (GEDO) */
+        .seccion-gedo { background: #eef2ff; border-left: 5px solid var(--gedo); padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .seccion-gedo h3 { color: var(--gedo); margin-top: 0; }
     </style>
 </head>
 <body>
 
+    <!-- PANTALLA DE LOGIN -->
     <div id="login-screen">
         <div style="text-align: center; margin-bottom: 30px;">
             <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
@@ -105,6 +114,7 @@
                 <label>Usuario (Rol Asignado):</label>
                 <select id="user-input">
                     <option value="jefe">Jefe de Regimiento (Cte)</option>
+                    <option value="segun">Segundo Jefe (J Pl My)</option>
                     <option value="s1">Oficial de Personal (S1)</option>
                     <option value="s2">Oficial de Inteligencia (S2)</option>
                     <option value="s3">Oficial de Operaciones (S3)</option>
@@ -119,12 +129,10 @@
         </div>
     </div>
 
+    <!-- APLICACIÓN PRINCIPAL -->
     <div id="app-screen">
         <header>
-            <h1>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                Tablero C2
-            </h1>
+            <h1><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> Tablero C2</h1>
             <div class="user-info">
                 <span id="display-user-name" style="font-weight: 600; letter-spacing: 0.5px;">Usuario</span>
                 <button class="logout-btn" onclick="logout()">Finalizar Sesión</button>
@@ -133,9 +141,11 @@
 
         <div class="container">
             
+            <!-- ============================================== -->
+            <!-- VISTA: JEFE DE REGIMIENTO -->
+            <!-- ============================================== -->
             <div id="view-jefe" class="module-view">
                 <h2>Comando Estratégico y Supervisión</h2>
-                
                 <div class="grid">
                     <div class="form-section" style="border-left-color: var(--alerta); grid-column: 1 / -1; margin-bottom: 0;">
                         <h3 style="margin-top:0; color: var(--alerta);">Emitir Directiva Particular</h3>
@@ -143,6 +153,7 @@
                             <div class="form-group" style="max-width: 250px;">
                                 <label>Destinatario</label>
                                 <select id="orden-area">
+                                    <option value="segun">Segundo Jefe (J Pl My)</option>
                                     <option value="s1">División Personal (S1)</option>
                                     <option value="s2">División Inteligencia (S2)</option>
                                     <option value="s3">División Operaciones (S3)</option>
@@ -150,248 +161,212 @@
                                     <option value="todos">Plana Mayor (General)</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label>Texto de la Orden / Directiva</label>
-                                <input type="text" id="orden-texto" placeholder="Ej: Convocar reunión de Plana Mayor a las 1800hs...">
-                            </div>
-                            <div class="form-group" style="flex: 0; min-width: 150px;">
-                                <button class="btn btn-danger" style="margin-top: 19px;" onclick="enviarOrden()">Transmitir Orden</button>
-                            </div>
+                            <div class="form-group"><label>Texto de la Orden / Directiva</label><input type="text" id="orden-texto" placeholder="Ej: Elevar informe de situación antes de 1200hs..."></div>
+                            <div class="form-group" style="flex: 0; min-width: 150px;"><button class="btn btn-danger" style="margin-top: 19px;" onclick="enviarOrden('jefe')">Transmitir Orden</button></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="grid" style="grid-template-columns: 2fr 1fr;">
                     <div class="card">
-                        <h3>Bandeja de Actualizaciones de la Plana Mayor (Tiempo Real)</h3>
-                        <div id="feed-general" style="max-height: 400px; overflow-y: auto;">
-                            </div>
-                        <button class="btn" style="margin-top: 20px; width: auto; font-size: 12px; padding: 8px 15px; background: #64748b;" onclick="limpiarBaseDatos()">Purgar Registros del Sistema</button>
+                        <h3>Bandeja de Actualizaciones de la Plana Mayor (Feed)</h3>
+                        <div id="feed-general" style="max-height: 400px; overflow-y: auto;"></div>
+                        <button class="btn" style="margin-top: 20px; width: auto; font-size: 12px; padding: 8px 15px; background: #64748b;" onclick="limpiarBaseDatos()">Purgar Registros</button>
                     </div>
-
                     <div style="display: flex; flex-direction: column; gap: 20px;">
                         <div class="card" style="border-left: 4px solid var(--info); border-top: none;">
                             <h3>Estado de Fuerza Consolidado (S1)</h3>
                             <h1 style="color: var(--info); font-size: 38px; margin: 10px 0; text-align: center;">94%</h1>
                             <p style="text-align: center; margin-top: 0; font-weight: bold; color: #475569;">Personal Operativo</p>
-                            <div style="font-size: 13px;">
-                                <div style="display:flex; justify-content: space-between; margin-bottom: 5px;"><span>Presentes:</span> <strong>420</strong></div>
-                                <div style="display:flex; justify-content: space-between; margin-bottom: 5px;"><span>Licencia:</span> <strong>15</strong></div>
-                                <div style="display:flex; justify-content: space-between; margin-bottom: 5px;"><span>Sanidad:</span> <strong>12</strong></div>
-                            </div>
                         </div>
                         <div class="card" style="border-left: 4px solid var(--aviso); border-top: none;">
-                            <h3>Disponibilidad Logística (S4)</h3>
-                            <div style="font-size: 13px;">
-                                <p><strong>Parque Automotor:</strong> 85% Op</p>
-                                <div style="background: #e2e8f0; height: 8px; border-radius: 4px; margin-bottom: 10px;"><div style="background: var(--ok); width: 85%; height: 100%; border-radius: 4px;"></div></div>
-                                <p><strong>Racionamiento (Clase I):</strong> Óptimo (12 días)</p>
-                                <p><strong>Combustible (Clase III):</strong> Medio (40%)</p>
-                            </div>
+                            <h3>Alerta Logística (S4)</h3>
+                            <p><strong>Parque Automotor:</strong> 85% Op</p>
+                            <div style="background: #e2e8f0; height: 8px; border-radius: 4px; margin-bottom: 10px;"><div style="background: var(--ok); width: 85%; height: 100%; border-radius: 4px;"></div></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="view-s1" class="module-view">
-                <h2>División Personal (S1)</h2>
-                <div id="s1-ordenes"></div>
+            <!-- ============================================== -->
+            <!-- VISTA: 2DO JEFE (JEFE PLANA MAYOR) -->
+            <!-- ============================================== -->
+            <div id="view-segun" class="module-view">
+                <h2>Jefatura de Plana Mayor (2do Jefe)</h2>
+                <div id="segun-ordenes"></div>
                 
-                <div class="form-section">
-                    <h3 style="margin-top:0;">Cargar Novedad de Personal (Parte Diario)</h3>
-                    <div class="form-row">
-                        <div class="form-group" style="max-width: 120px;">
-                            <label>Grado</label>
-                            <select id="s1-grado">
-                                <option>SV</option><option>Cbo</option><option>Cbo 1ro</option><option>Sarg</option><option>Sarg 1ro</option><option>Subof Pr</option>
-                                <option>Subt</option><option>Tte</option><option>Tte 1ro</option><option>Cap</option><option>My</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Apellido y Nombre</label>
-                            <input type="text" id="s1-apellido" placeholder="Ej: CABRAL Federico">
-                        </div>
-                        <div class="form-group" style="max-width: 200px;">
-                            <label>Situación / Novedad</label>
-                            <select id="s1-novedad">
-                                <option value="Parte de Enfermo">Parte de Enfermo</option>
-                                <option value="Licencia Ordinaria">Licencia Ordinaria</option>
-                                <option value="Comisión del Servicio">Comisión</option>
-                                <option value="Prevención Rigurosa">Sanción (Prev. Rig.)</option>
-                                <option value="Baja">Baja</option>
-                            </select>
-                        </div>
-                        <div class="form-group" style="flex: 0; min-width: 120px;">
-                            <button class="btn" style="margin-top: 19px;" onclick="guardarRegistroS1()">Registrar</button>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="grid">
-                    <div class="card" style="grid-column: 1 / -1;">
-                        <h3>Registro de Novedades del Personal</h3>
-                        <div class="table-container">
-                            <table id="tabla-s1">
-                                <thead><tr><th>Fecha Carga</th><th>Grado y Nombre</th><th>Novedad Registrada</th></tr></thead>
-                                <tbody></tbody>
-                            </table>
+                    <div class="form-section" style="border-left-color: var(--aviso); grid-column: 1 / -1;">
+                        <h3 style="margin-top:0; color: var(--aviso);">Coordinación: Establecer Términos y Tareas a la Plana Mayor</h3>
+                        <div class="form-row">
+                            <div class="form-group" style="max-width: 200px;"><label>Oficial / División</label>
+                                <select id="segun-area-orden"><option value="s1">S1 (Personal)</option><option value="s2">S2 (Inteligencia)</option><option value="s3">S3 (Operaciones)</option><option value="s4">S4 (Logística)</option></select>
+                            </div>
+                            <div class="form-group"><label>Tarea a Coordinar</label><input type="text" id="segun-orden-texto" placeholder="Ej: Confeccionar Anexo Logístico para OO 02/26"></div>
+                            <div class="form-group" style="flex: 0; min-width: 150px;"><button class="btn" style="margin-top: 19px; background: var(--aviso);" onclick="enviarOrden('segun')">Impartir Tarea</button></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-section" style="border-left-color: var(--info);">
-                    <h3 style="margin-top:0; color: var(--info);">Seguimiento Administrativo: Cambio de Cuerpo (Suboficiales)</h3>
-                    <div class="form-row">
-                        <div class="form-group"><label>Suboficial Postulante</label><input type="text" id="s1-postulante" placeholder="Grado y Apellido"></div>
-                        <div class="form-group" style="max-width: 250px;">
-                            <label>Estado del Trámite</label>
-                            <select id="s1-tramite-estado">
-                                <option value="Iniciando Expediente">Iniciando Expediente (GEDO)</option>
-                                <option value="Apto Médico en curso">Apto Médico en curso</option>
-                                <option value="Rindiendo Exámenes">Rindiendo Exámenes</option>
-                                <option value="Aprobado - Esperando Resolución">Aprobado - Esperando Resolución</option>
-                            </select>
-                        </div>
-                        <div class="form-group" style="flex: 0; min-width: 120px;">
-                            <button class="btn btn-info" style="margin-top: 19px;" onclick="guardarCambioCuerpo()">Actualizar</button>
-                        </div>
-                    </div>
-                    <div class="table-container" style="max-height: 150px; margin-top: 15px;">
-                        <table id="tabla-cambio-cuerpo">
-                            <thead><tr><th>Fecha</th><th>Suboficial</th><th>Estado del Trámite</th></tr></thead>
+                <div class="card" style="border-left: 5px solid var(--gedo); border-top:none;">
+                    <h3 style="color: var(--gedo);">Mesa de Entradas y Control de Términos (GEDO/MM)</h3>
+                    <p style="font-size: 13px; color: #64748b;">Monitoreo centralizado de todos los documentos y expedientes cargados por las divisiones.</p>
+                    <div class="table-container">
+                        <table id="tabla-todos-documentos">
+                            <thead><tr><th>División</th><th>Tipo</th><th>Nro / Referencia</th><th>Asunto</th><th>Término (Vto)</th><th>Estado</th></tr></thead>
                             <tbody></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+            <!-- ============================================== -->
+            <!-- VISTAS S1 a S4 -->
+            <!-- ============================================== -->
+
+            <!-- VISTA: S1 PERSONAL -->
+            <div id="view-s1" class="module-view">
+                <h2>División Personal (S1)</h2>
+                <div id="s1-ordenes"></div>
+                
+                <div class="grid">
+                    <div class="form-section" style="margin-bottom:0;">
+                        <h3 style="margin-top:0;">Parte Diario de Novedades</h3>
+                        <div class="form-row">
+                            <div class="form-group" style="max-width: 100px;"><label>Grado</label><select id="s1-grado"><option>SV</option><option>Cbo</option><option>Sarg</option><option>Subof Pr</option><option>Tte</option><option>Cap</option></select></div>
+                            <div class="form-group"><label>Apellido y Nombre</label><input type="text" id="s1-apellido" placeholder="Ej: CABRAL Federico"></div>
+                            <div class="form-group" style="max-width: 180px;"><label>Situación</label><select id="s1-novedad"><option value="Parte de Enfermo">Parte de Enfermo</option><option value="Licencia Ordinaria">Licencia Ordinaria</option><option value="Prevención Rigurosa">Sanción (Prev. Rig.)</option></select></div>
+                        </div>
+                        <button class="btn" onclick="guardarRegistroS1()">Registrar Parte</button>
+                    </div>
+
+                    <div class="form-section" style="border-left-color: var(--alerta); margin-bottom:0;">
+                        <h3 style="margin-top:0; color: var(--alerta);">Control Sanitario: Juntas Médicas</h3>
+                        <div class="form-row">
+                            <div class="form-group"><label>Personal</label><input type="text" id="s1-jm-personal" placeholder="Grado y Nombre"></div>
+                            <div class="form-group"><label>Diagnóstico / Causa</label><input type="text" id="s1-jm-causa" placeholder="Ej: Lesión rodilla (Acto del Servicio)"></div>
+                            <div class="form-group" style="max-width: 150px;"><label>Vto Licencia</label><input type="date" id="s1-jm-vto"></div>
+                        </div>
+                        <button class="btn btn-danger" onclick="guardarJuntaMedica()">Cargar Seguimiento</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Registros de Juntas Médicas Activas</h3>
+                    <div class="table-container"><table id="tabla-s1-jm"><thead><tr><th>Fecha Ingreso</th><th>Personal</th><th>Diagnóstico</th><th>Vencimiento Lic</th></tr></thead><tbody></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- VISTA: S2 INTELIGENCIA -->
             <div id="view-s2" class="module-view">
                 <h2>División Inteligencia y Seguridad (S2)</h2>
                 <div id="s2-ordenes"></div>
                 
                 <div class="grid">
-                    <div class="form-section" style="margin-bottom: 0;">
-                        <h3 style="margin-top:0;">Parte de Seguridad / Incidentes</h3>
+                    <div class="form-section" style="margin-bottom:0;">
+                        <h3 style="margin-top:0;">Apreciación / Eventos de Seguridad</h3>
                         <div class="form-row">
-                            <div class="form-group">
-                                <label>Tipo de Evento</label>
-                                <select id="s2-tipo">
-                                    <option value="Control Perimetral">Control Perimetral</option>
-                                    <option value="Ingreso de Visita Civil">Ingreso de Visita Civil</option>
-                                    <option value="Incidente de Seguridad">Incidente de Seguridad</option>
-                                    <option value="Auditoría de Documentación">Auditoría de Documentación</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Detalle y Apreciación</label>
-                                <input type="text" id="s2-detalle" placeholder="Describa el suceso detalladamente...">
-                            </div>
+                            <div class="form-group" style="max-width: 200px;"><label>Evento</label><select id="s2-tipo"><option value="Incidente de Seguridad">Incidente de Seguridad</option><option value="Alerta Meteorológica">Alerta Meteorológica</option></select></div>
+                            <div class="form-group"><label>Detalle</label><input type="text" id="s2-detalle" placeholder="Describa el suceso detalladamente..."></div>
                         </div>
                         <button class="btn" onclick="guardarRegistroS2()">Elevar Informe</button>
                     </div>
 
-                    <div class="form-section" style="border-left-color: var(--aviso); margin-bottom: 0;">
-                        <h3 style="margin-top:0; color: var(--aviso);">Apreciación Meteorológica Local</h3>
+                    <div class="form-section" style="border-left-color: var(--info); margin-bottom:0;">
+                        <h3 style="margin-top:0; color: var(--info);">Control de Habilitaciones de Seguridad</h3>
                         <div class="form-row">
-                            <div class="form-group"><label>Zona / Región</label><input type="text" id="s2-clima-zona" value="Guarnición Córdoba" readonly style="background:#f1f5f9;"></div>
-                            <div class="form-group"><label>Condición</label>
-                                <select id="s2-clima-condicion"><option>Despejado</option><option>Lluvia Fuerte</option><option>Vientos Zonda/Fuertes</option><option>Niebla (Baja Visibilidad)</option></select>
-                            </div>
+                            <div class="form-group"><label>Personal</label><input type="text" id="s2-hab-per" placeholder="Grado y Nombre"></div>
+                            <div class="form-group"><label>Clasificación Asignada</label><select id="s2-hab-nivel"><option>CONFIDENCIAL</option><option>SECRETO</option><option>ESTRICTAMENTE SECRETO Y CONFIDENCIAL</option></select></div>
                         </div>
-                        <button class="btn" style="background: var(--aviso);" onclick="guardarClimaS2()">Actualizar Estado Clima</button>
+                        <button class="btn btn-info" onclick="guardarHabilitacionS2()">Otorgar Habilitación</button>
                     </div>
                 </div>
-
+                
                 <div class="card">
-                    <h3>Libro Histórico de Inteligencia y Seguridad</h3>
-                    <div class="table-container">
-                        <table id="tabla-s2">
-                            <thead><tr><th>Fecha/Hora</th><th>Clasificación</th><th>Detalle / Apreciación</th></tr></thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
+                    <h3>Personal con Habilitación de Seguridad Vigente</h3>
+                    <div class="table-container"><table id="tabla-s2-hab"><thead><tr><th>Fecha Otorgamiento</th><th>Personal</th><th>Nivel de Clasificación</th></tr></thead><tbody></tbody></table></div>
                 </div>
             </div>
 
+            <!-- VISTA: S3 OPERACIONES -->
             <div id="view-s3" class="module-view">
                 <h2>División Operaciones e Instrucción (S3)</h2>
                 <div id="s3-ordenes"></div>
                 
-                <div class="form-section">
-                    <h3 style="margin-top:0;">Programación PEA y Reserva de Instalaciones</h3>
-                    <div class="form-row">
-                        <div class="form-group" style="max-width: 150px;"><label>Fecha de Ejecución</label><input type="date" id="s3-fecha"></div>
-                        <div class="form-group" style="max-width: 150px;"><label>Subunidad Ejecutora</label>
-                            <select id="s3-subunidad"><option>Ca Ite A</option><option>Ca Ite B</option><option>Ca Cdo Ser</option></select>
+                <div class="grid">
+                    <div class="form-section" style="margin-bottom:0;">
+                        <h3 style="margin-top:0;">Programación PEA (Actividades)</h3>
+                        <div class="form-row">
+                            <div class="form-group" style="max-width: 150px;"><label>Fecha</label><input type="date" id="s3-fecha"></div>
+                            <div class="form-group" style="max-width: 150px;"><label>Subunidad</label><select id="s3-subunidad"><option>Ca Ite A</option><option>Ca Ite B</option></select></div>
+                            <div class="form-group"><label>Actividad</label><input type="text" id="s3-actividad" placeholder="Ej: Tiro con FAL"></div>
                         </div>
-                        <div class="form-group"><label>Actividad Programada (PEA)</label><input type="text" id="s3-actividad" placeholder="Ej: Tiro con FAL a 150m"></div>
-                        <div class="form-group" style="max-width: 200px;"><label>Instalación / Lugar</label>
-                            <select id="s3-lugar"><option>Polígono Guarnición</option><option>Pista Combate Urbano</option><option>Plaza de Armas</option><option>Terreno Instrucción</option></select>
+                        <button class="btn" onclick="guardarRegistroS3()">Programar Instrucción</button>
+                    </div>
+
+                    <div class="form-section" style="border-left-color: var(--aviso); margin-bottom:0;">
+                        <h3 style="margin-top:0; color:var(--aviso);">Estado de Apresto Operacional</h3>
+                        <div class="form-row">
+                            <div class="form-group"><label>Subunidad</label><select id="s3-apresto-sub"><option>Ca Ite A</option><option>Ca Ite B</option><option>Ca Cdo Ser</option></select></div>
+                            <div class="form-group"><label>Nivel de Instrucción</label><select id="s3-apresto-niv"><option>Nivel Celda/Grupo</option><option>Nivel Sección</option><option>Nivel Subunidad</option></select></div>
+                            <div class="form-group"><label>Porcentaje Adiestramiento</label><input type="number" id="s3-apresto-pct" placeholder="Ej: 85" min="0" max="100"></div>
                         </div>
-                        <div class="form-group" style="flex: 0; min-width: 120px;"><button class="btn" style="margin-top: 19px;" onclick="guardarRegistroS3()">Programar</button></div>
+                        <button class="btn" style="background:var(--aviso);" onclick="guardarAprestoS3()">Actualizar Apresto</button>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h3>Cronograma de Operaciones Aprobado</h3>
-                    <div class="table-container">
-                        <table id="tabla-s3">
-                            <thead><tr><th>Fecha Prog.</th><th>Subunidad</th><th>Actividad Doctrinaria</th><th>Instalación Reservada</th></tr></thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
+                    <h3>Tablero de Apresto por Subunidad</h3>
+                    <div class="table-container"><table id="tabla-s3-apresto"><thead><tr><th>Fecha Actualización</th><th>Subunidad</th><th>Fase de Instrucción</th><th>Efectividad (%)</th></tr></thead><tbody></tbody></table></div>
                 </div>
             </div>
 
+            <!-- VISTA: S4 LOGÍSTICA -->
             <div id="view-s4" class="module-view">
                 <h2>División Logística y Materiales (S4)</h2>
                 <div id="s4-ordenes"></div>
                 
                 <div class="grid">
-                    <div class="form-section" style="margin-bottom: 0;">
-                        <h3 style="margin-top:0;">Novedades de Parque Automotor y Materiales</h3>
+                    <div class="form-section" style="margin-bottom:0;">
+                        <h3 style="margin-top:0;">Novedades de Parque Automotor</h3>
                         <div class="form-row">
-                            <div class="form-group">
-                                <label>Clase de Abastecimiento</label>
-                                <select id="s4-clase">
-                                    <option value="Clase VII (Vehículo a Rueda)">Clase VII - Vehículos a Rueda</option>
-                                    <option value="Clase VII (Vehículo Oruga)">Clase VII - Vehículos a Oruga</option>
-                                    <option value="Clase II (Armamento)">Clase II - Armamento / Comunicaciones</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Identificación (NI / Matrícula)</label><input type="text" id="s4-identificacion" placeholder="Ej: NI 45211 (MB 1114)"></div>
-                            <div class="form-group" style="max-width: 150px;"><label>Estado Técnico</label>
-                                <select id="s4-estado"><option value="Operativo">Operativo</option><option value="Mantenimiento 1er Esc">Mantenimiento</option><option value="Fuera de Servicio">F/S</option></select>
-                            </div>
+                            <div class="form-group"><label>Vehículo (NI)</label><input type="text" id="s4-identificacion" placeholder="Ej: NI 45211"></div>
+                            <div class="form-group" style="max-width: 150px;"><label>Estado Técnico</label><select id="s4-estado"><option value="Operativo">Operativo</option><option value="Mantenimiento 1er Esc">Mantenimiento</option><option value="Fuera de Servicio">F/S</option></select></div>
                         </div>
                         <button class="btn" onclick="guardarRegistroS4()">Actualizar Material</button>
                     </div>
 
-                    <div class="form-section" style="border-left-color: var(--info); margin-bottom: 0;">
-                        <h3 style="margin-top:0; color: var(--info);">Cálculo de Racionamiento (Clase I)</h3>
+                    <div class="form-section" style="border-left-color: var(--ok); margin-bottom:0;">
+                        <h3 style="margin-top:0; color: var(--ok);">Registro de Inspecciones (Polvorín/Parque)</h3>
                         <div class="form-row">
-                            <div class="form-group"><label>Efectivos a Racionar</label><input type="number" id="s4-efectivos" placeholder="Cantidad numérica"></div>
-                            <div class="form-group"><label>Tipo de Ración</label>
-                                <select id="s4-racion"><option>Ración Caliente (Guarnición)</option><option>Ración de Combate (Terreno)</option></select>
-                            </div>
+                            <div class="form-group"><label>Instalación</label><select id="s4-insp-lugar"><option>Polvorín Principal</option><option>Parque Automotor</option><option>Sala de Armas (Ca A)</option></select></div>
+                            <div class="form-group"><label>Resultado / Novedad</label><input type="text" id="s4-insp-res" placeholder="Ej: Medidas de seguridad óptimas."></div>
                         </div>
-                        <button class="btn btn-info" onclick="guardarRacionamiento()">Procesar Pedido Intendencia</button>
+                        <button class="btn" style="background:var(--ok);" onclick="guardarInspeccionS4()">Cargar Inspección</button>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h3>Estado General de Materiales y Abastecimiento</h3>
-                    <div class="table-container">
-                        <table id="tabla-s4">
-                            <thead><tr><th>Fecha Reporte</th><th>Rubro / Clase</th><th>Ítem / Cantidad</th><th>Estado / Resolución</th></tr></thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
+                    <h3>Últimas Inspecciones Logísticas Realizadas</h3>
+                    <div class="table-container"><table id="tabla-s4-insp"><thead><tr><th>Fecha Inspección</th><th>Instalación</th><th>Resultado y Novedades</th></tr></thead><tbody></tbody></table></div>
                 </div>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- MODULO COMPARTIDO: GESTION DOCUMENTAL (Para S1,S2,S3,S4) -->
+            <!-- ============================================== -->
+            <div id="modulo-documental" class="seccion-gedo" style="display: none;">
+                <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:text-bottom;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Mesa de Entradas: Gestión de GEDO y Mensajes Militares</h3>
+                <div class="form-row">
+                    <div class="form-group" style="max-width: 150px;"><label>Tipo de Documento</label><select id="doc-tipo"><option value="Expediente GEDO">Expediente GEDO</option><option value="Nota / IFGRA">Nota (IFGRA)</option><option value="Mensaje Militar">Mensaje Militar (MM)</option></select></div>
+                    <div class="form-group" style="max-width: 250px;"><label>Nro (Ej: EX-2026-12345678)</label><input type="text" id="doc-nro" placeholder="Número de referencia"></div>
+                    <div class="form-group"><label>Asunto o Extracto</label><input type="text" id="doc-asunto" placeholder="Ej: Eleva Plan Anual de Contrataciones"></div>
+                    <div class="form-group" style="max-width: 150px;"><label>Término (Vencimiento)</label><input type="date" id="doc-termino"></div>
+                </div>
+                <button class="btn btn-gedo" onclick="guardarDocumento()">Radicar Documento / Establecer Término</button>
+
+                <h4 style="margin-top: 20px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Mis Documentos en Trámite</h4>
+                <div class="table-container"><table id="tabla-mis-documentos"><thead><tr><th>Fecha Ingreso</th><th>Tipo</th><th>Nro / Referencia</th><th>Asunto</th><th>Término (Vto)</th><th>Estado</th></tr></thead><tbody></tbody></table></div>
             </div>
 
         </div>
@@ -402,18 +377,22 @@
     <script>
         // Usuarios y Autenticación
         const roles = {
-            'jefe': { pass: '1234', name: 'Jefe de Regimiento', view: 'view-jefe' },
-            's1':   { pass: '1234', name: 'Oficial de Personal (S1)', view: 'view-s1' },
-            's2':   { pass: '1234', name: 'Oficial de Inteligencia (S2)', view: 'view-s2' },
-            's3':   { pass: '1234', name: 'Oficial de Operaciones (S3)', view: 'view-s3' },
-            's4':   { pass: '1234', name: 'Oficial de Logística (S4)', view: 'view-s4' }
+            'jefe':  { pass: '1234', name: 'Jefe de Regimiento', view: 'view-jefe' },
+            'segun': { pass: '1234', name: 'Segundo Jefe (Jefe Plana Mayor)', view: 'view-segun' },
+            's1':    { pass: '1234', name: 'Oficial de Personal (S1)', view: 'view-s1' },
+            's2':    { pass: '1234', name: 'Oficial de Inteligencia (S2)', view: 'view-s2' },
+            's3':    { pass: '1234', name: 'Oficial de Operaciones (S3)', view: 'view-s3' },
+            's4':    { pass: '1234', name: 'Oficial de Logística (S4)', view: 'view-s4' }
         };
+
+        let currentRoleKey = '';
 
         function login() {
             const user = document.getElementById('user-input').value;
             const pass = document.getElementById('pass-input').value;
 
             if (roles[user] && roles[user].pass === pass) {
+                currentRoleKey = user;
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-screen').style.display = 'block';
                 document.getElementById('display-user-name').innerText = roles[user].name;
@@ -421,147 +400,168 @@
                 document.querySelectorAll('.module-view').forEach(el => el.classList.remove('active'));
                 document.getElementById(roles[user].view).classList.add('active');
 
+                // Mostrar Módulo Documental solo para S1 a S4
+                if(user.startsWith('s')) {
+                    document.getElementById('modulo-documental').style.display = 'block';
+                    document.getElementById(roles[user].view).appendChild(document.getElementById('modulo-documental'));
+                } else {
+                    document.getElementById('modulo-documental').style.display = 'none';
+                }
+
                 cargarTodasLasTablas();
                 if(user === 'jefe') cargarFeedGeneral();
                 else cargarOrdenesRecibidas(user);
                 
-                mostrarToast('Conexión establecida como: ' + roles[user].name);
-            } else {
-                alert('Credenciales incorrectas.');
-            }
+                mostrarToast('Conexión establecida: ' + roles[user].name);
+            } else { alert('Credenciales incorrectas.'); }
         }
 
         function logout() {
+            currentRoleKey = '';
             document.getElementById('pass-input').value = '';
             document.getElementById('app-screen').style.display = 'none';
             document.getElementById('login-screen').style.display = 'flex';
         }
 
-        // --- SISTEMA DE ALMACENAMIENTO (LOCALSTORAGE) ---
+        // --- SISTEMA DE ALMACENAMIENTO ---
         function guardarDatoGen(claveStorage, objetoDato, moduloFeed) {
             let datos = JSON.parse(localStorage.getItem(claveStorage)) || [];
             datos.push(objetoDato);
             localStorage.setItem(claveStorage, JSON.stringify(datos));
             
-            // Replicar en el panel del Jefe
             let feed = JSON.parse(localStorage.getItem('feed_general')) || [];
             feed.push({ area: moduloFeed, dato: objetoDato });
             localStorage.setItem('feed_general', JSON.stringify(feed));
         }
 
-        // GUARDADO S1
+        // MÓDULO DOCUMENTAL (GEDO/MM)
+        function guardarDocumento() {
+            const tipo = document.getElementById('doc-tipo').value;
+            const nro = document.getElementById('doc-nro').value;
+            const asunto = document.getElementById('doc-asunto').value;
+            const termino = document.getElementById('doc-termino').value;
+            
+            if(!nro || !asunto) return alert('Complete Número y Asunto.');
+            
+            const areaFormat = currentRoleKey.toUpperCase();
+            guardarDatoGen('datos_documentos', { 
+                fecha: new Date().toLocaleDateString(), area: areaFormat, tipo: tipo, nro: nro, asunto: asunto, termino: termino || 'Sin término', estado: 'En Proceso' 
+            }, `DOC-${areaFormat}`);
+            
+            document.getElementById('doc-nro').value = ''; document.getElementById('doc-asunto').value = '';
+            cargarTodasLasTablas(); mostrarToast('Documento radicado en sistema.');
+        }
+
+        // ESPECÍFICOS S1
         function guardarRegistroS1() {
-            const grado = document.getElementById('s1-grado').value;
-            const apellido = document.getElementById('s1-apellido').value;
-            const novedad = document.getElementById('s1-novedad').value;
-            if(!apellido) return alert('Falta Apellido.');
-            
-            guardarDatoGen('datos_s1', { fecha: new Date().toLocaleString(), personal: `${grado} ${apellido}`, novedad: novedad }, 'S1');
-            document.getElementById('s1-apellido').value = '';
-            cargarTodasLasTablas(); mostrarToast('Parte de Personal procesado.');
+            const n = document.getElementById('s1-apellido').value;
+            if(!n) return;
+            guardarDatoGen('datos_s1', { fecha: new Date().toLocaleString(), personal: `${document.getElementById('s1-grado').value} ${n}`, novedad: document.getElementById('s1-novedad').value }, 'S1');
+            document.getElementById('s1-apellido').value = ''; cargarTodasLasTablas(); mostrarToast('Parte registrado.');
+        }
+        function guardarJuntaMedica() {
+            const p = document.getElementById('s1-jm-personal').value; const c = document.getElementById('s1-jm-causa').value; const v = document.getElementById('s1-jm-vto').value;
+            if(!p) return;
+            guardarDatoGen('datos_s1_jm', { fecha: new Date().toLocaleDateString(), personal: p, causa: c, vto: v }, 'S1-Sanidad');
+            document.getElementById('s1-jm-personal').value = ''; cargarTodasLasTablas(); mostrarToast('Junta Médica registrada.');
         }
 
-        function guardarCambioCuerpo() {
-            const post = document.getElementById('s1-postulante').value;
-            const est = document.getElementById('s1-tramite-estado').value;
-            if(!post) return;
-            guardarDatoGen('datos_s1_cc', { fecha: new Date().toLocaleString(), postulante: post, estado: est }, 'S1-CC');
-            document.getElementById('s1-postulante').value = '';
-            cargarTodasLasTablas(); mostrarToast('Expediente actualizado.');
-        }
-
-        // GUARDADO S2
+        // ESPECÍFICOS S2
         function guardarRegistroS2() {
-            const tipo = document.getElementById('s2-tipo').value;
-            const detalle = document.getElementById('s2-detalle').value;
-            if(!detalle) return alert('Falta detalle.');
-            
-            guardarDatoGen('datos_s2', { fecha: new Date().toLocaleString(), tipo: tipo, detalle: detalle }, 'S2');
-            document.getElementById('s2-detalle').value = '';
-            cargarTodasLasTablas(); mostrarToast('Informe de Inteligencia elevado.');
+            const d = document.getElementById('s2-detalle').value; if(!d) return;
+            guardarDatoGen('datos_s2', { fecha: new Date().toLocaleString(), tipo: document.getElementById('s2-tipo').value, detalle: d }, 'S2');
+            document.getElementById('s2-detalle').value = ''; cargarTodasLasTablas(); mostrarToast('Informe elevado.');
+        }
+        function guardarHabilitacionS2() {
+            const p = document.getElementById('s2-hab-per').value; if(!p) return;
+            guardarDatoGen('datos_s2_hab', { fecha: new Date().toLocaleDateString(), personal: p, nivel: document.getElementById('s2-hab-nivel').value }, 'S2-HabSeg');
+            document.getElementById('s2-hab-per').value = ''; cargarTodasLasTablas(); mostrarToast('Habilitación otorgada.');
         }
 
-        function guardarClimaS2() {
-            const zona = document.getElementById('s2-clima-zona').value;
-            const cond = document.getElementById('s2-clima-condicion').value;
-            guardarDatoGen('datos_s2', { fecha: new Date().toLocaleString(), tipo: `Alerta Met: ${zona}`, detalle: cond }, 'S2-Met');
-            cargarTodasLasTablas(); mostrarToast('Condiciones climáticas actualizadas.');
-        }
-
-        // GUARDADO S3
+        // ESPECÍFICOS S3
         function guardarRegistroS3() {
-            const sub = document.getElementById('s3-subunidad').value;
-            const fecha = document.getElementById('s3-fecha').value;
-            const act = document.getElementById('s3-actividad').value;
-            const lug = document.getElementById('s3-lugar').value;
-            if(!act || !fecha) return alert('Complete fecha y actividad.');
-            
-            guardarDatoGen('datos_s3', { fechaCarga: new Date().toLocaleString(), fechaProg: fecha, subunidad: sub, actividad: act, lugar: lug }, 'S3');
-            document.getElementById('s3-actividad').value = '';
-            cargarTodasLasTablas(); mostrarToast('Instalación reservada (PEA).');
+            const a = document.getElementById('s3-actividad').value; if(!a) return;
+            guardarDatoGen('datos_s3', { fechaCarga: new Date().toLocaleString(), fechaProg: document.getElementById('s3-fecha').value, subunidad: document.getElementById('s3-subunidad').value, actividad: a }, 'S3');
+            document.getElementById('s3-actividad').value = ''; cargarTodasLasTablas(); mostrarToast('Actividad programada.');
+        }
+        function guardarAprestoS3() {
+            const pct = document.getElementById('s3-apresto-pct').value; if(!pct) return;
+            guardarDatoGen('datos_s3_apresto', { fecha: new Date().toLocaleDateString(), subunidad: document.getElementById('s3-apresto-sub').value, nivel: document.getElementById('s3-apresto-niv').value, pct: pct }, 'S3-Apresto');
+            cargarTodasLasTablas(); mostrarToast('Estado de Apresto actualizado.');
         }
 
-        // GUARDADO S4
+        // ESPECÍFICOS S4
         function guardarRegistroS4() {
-            const clase = document.getElementById('s4-clase').value;
-            const id = document.getElementById('s4-identificacion').value;
-            const est = document.getElementById('s4-estado').value;
-            if(!id) return alert('Falta Identificación.');
-            
-            guardarDatoGen('datos_s4', { fecha: new Date().toLocaleString(), clase: clase, identificacion: id, estado: est }, 'S4');
-            document.getElementById('s4-identificacion').value = '';
-            cargarTodasLasTablas(); mostrarToast('Estado Técnico actualizado.');
+            const id = document.getElementById('s4-identificacion').value; if(!id) return;
+            guardarDatoGen('datos_s4', { fecha: new Date().toLocaleString(), identificacion: id, estado: document.getElementById('s4-estado').value }, 'S4');
+            document.getElementById('s4-identificacion').value = ''; cargarTodasLasTablas(); mostrarToast('Estado de material actualizado.');
+        }
+        function guardarInspeccionS4() {
+            const res = document.getElementById('s4-insp-res').value; if(!res) return;
+            guardarDatoGen('datos_s4_insp', { fecha: new Date().toLocaleDateString(), lugar: document.getElementById('s4-insp-lugar').value, resultado: res }, 'S4-Insp');
+            document.getElementById('s4-insp-res').value = ''; cargarTodasLasTablas(); mostrarToast('Inspección guardada.');
         }
 
-        function guardarRacionamiento() {
-            const ef = document.getElementById('s4-efectivos').value;
-            const racion = document.getElementById('s4-racion').value;
-            if(!ef) return;
-            guardarDatoGen('datos_s4', { fecha: new Date().toLocaleString(), clase: 'Clase I (Racionamiento)', identificacion: `${ef} Efectivos`, estado: racion }, 'S4-Rac');
-            document.getElementById('s4-efectivos').value = '';
-            cargarTodasLasTablas(); mostrarToast('Pedido de Racionamiento procesado.');
-        }
-
-        // JEFE: EMITIR ORDEN
-        function enviarOrden() {
-            const area = document.getElementById('orden-area').value;
-            const texto = document.getElementById('orden-texto').value;
+        // EMISIÓN DE ÓRDENES (Jefe y 2do Jefe)
+        function enviarOrden(emisor) {
+            let areaId = emisor === 'jefe' ? 'orden-area' : 'segun-area-orden';
+            let textoId = emisor === 'jefe' ? 'orden-texto' : 'segun-orden-texto';
+            const area = document.getElementById(areaId).value;
+            const texto = document.getElementById(textoId).value;
             if(!texto) return;
 
-            let areas = area === 'todos' ? ['s1','s2','s3','s4'] : [area];
+            const prefijo = emisor === 'jefe' ? 'DIRECTIVA DEL JEFE: ' : 'TAREA PLANA MAYOR: ';
+            let areas = area === 'todos' ? ['segun','s1','s2','s3','s4'] : [area];
             areas.forEach(a => {
                 let ordenes = JSON.parse(localStorage.getItem('ordenes_' + a)) || [];
-                ordenes.push({ fecha: new Date().toLocaleString(), texto: texto });
+                ordenes.push({ fecha: new Date().toLocaleString(), texto: prefijo + texto });
                 localStorage.setItem('ordenes_' + a, JSON.stringify(ordenes));
             });
-            document.getElementById('orden-texto').value = '';
-            mostrarToast('Directiva transmitida con éxito.');
+            document.getElementById(textoId).value = ''; mostrarToast('Orden transmitida con éxito.');
         }
 
-        // --- SISTEMA DE RENDERIZADO ---
+        // --- RENDERIZADO DE TABLAS ---
         function cargarTodasLasTablas() {
-            renderTabla('datos_s1', 'tabla-s1', i => `<tr><td>${i.fecha}</td><td>${i.personal}</td><td>${badgeStatus(i.novedad)}</td></tr>`);
-            renderTabla('datos_s1_cc', 'tabla-cambio-cuerpo', i => `<tr><td>${i.fecha}</td><td><strong>${i.postulante}</strong></td><td><span class="badge bg-azul">${i.estado}</span></td></tr>`);
-            renderTabla('datos_s2', 'tabla-s2', i => `<tr><td>${i.fecha}</td><td><strong>${i.tipo}</strong></td><td>${i.detalle}</td></tr>`);
-            renderTabla('datos_s3', 'tabla-s3', i => `<tr><td>${i.fechaProg}</td><td>${i.subunidad}</td><td>${i.actividad}</td><td>${i.lugar}</td></tr>`);
-            renderTabla('datos_s4', 'tabla-s4', i => `<tr><td>${i.fecha}</td><td>${i.clase}</td><td>${i.identificacion}</td><td>${badgeStatus(i.estado)}</td></tr>`);
+            // S1
+            renderTabla('datos_s1_jm', 'tabla-s1-jm', i => `<tr><td>${i.fecha}</td><td><strong>${i.personal}</strong></td><td>${i.causa}</td><td><span class="badge bg-rojo">${i.vto}</span></td></tr>`);
+            // S2
+            renderTabla('datos_s2_hab', 'tabla-s2-hab', i => `<tr><td>${i.fecha}</td><td><strong>${i.personal}</strong></td><td><span class="badge bg-violeta">${i.nivel}</span></td></tr>`);
+            // S3
+            renderTabla('datos_s3_apresto', 'tabla-s3-apresto', i => `<tr><td>${i.fecha}</td><td><strong>${i.subunidad}</strong></td><td>${i.nivel}</td><td><div style="background:#e2e8f0; width:100%; border-radius:4px;"><div style="background:var(--ok); width:${i.pct}%; padding:2px; color:white; font-size:10px; text-align:center; border-radius:4px;">${i.pct}%</div></div></td></tr>`);
+            // S4
+            renderTabla('datos_s4_insp', 'tabla-s4-insp', i => `<tr><td>${i.fecha}</td><td><strong>${i.lugar}</strong></td><td>${i.resultado}</td></tr>`);
+            
+            // Documentos (GEDO)
+            const docs = JSON.parse(localStorage.getItem('datos_documentos')) || [];
+            // Para el S logueado (solo ve los suyos)
+            if(currentRoleKey.startsWith('s')) {
+                const misDocs = docs.filter(d => d.area === currentRoleKey.toUpperCase());
+                inyectarTabla('tabla-mis-documentos', misDocs, i => `<tr><td>${i.fecha}</td><td>${i.tipo}</td><td><strong>${i.nro}</strong></td><td>${i.asunto}</td><td><span class="badge bg-amarillo">${i.termino}</span></td><td><span class="badge bg-info" style="background:#64748b;">${i.estado}</span></td></tr>`);
+            }
+            // Para el 2do Jefe (Ve TODOS)
+            if(currentRoleKey === 'segun') {
+                inyectarTabla('tabla-todos-documentos', docs, i => `<tr><td><span class="badge bg-verde">${i.area}</span></td><td>${i.tipo}</td><td><strong>${i.nro}</strong></td><td>${i.asunto}</td><td><span class="badge bg-alerta" style="background:var(--alerta);">${i.termino}</span></td><td><span class="badge bg-info" style="background:#64748b;">${i.estado}</span></td></tr>`);
+            }
         }
 
         function renderTabla(clave, idTabla, fnFila) {
             const datos = JSON.parse(localStorage.getItem(clave)) || [];
+            inyectarTabla(idTabla, datos, fnFila);
+        }
+
+        function inyectarTabla(idTabla, arrayDatos, fnFila) {
             const tbody = document.getElementById(idTabla).getElementsByTagName('tbody')[0];
             tbody.innerHTML = '';
-            if(datos.length === 0) return tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#94a3b8;">Sin registros.</td></tr>';
-            [...datos].reverse().forEach(item => tbody.innerHTML += fnFila(item));
+            if(arrayDatos.length === 0) return tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94a3b8;">Sin registros.</td></tr>';
+            [...arrayDatos].reverse().forEach(item => tbody.innerHTML += fnFila(item));
         }
 
         function cargarOrdenesRecibidas(area) {
             const contenedor = document.getElementById(area + '-ordenes');
             const ordenes = JSON.parse(localStorage.getItem('ordenes_' + area)) || [];
             if (ordenes.length === 0) { contenedor.innerHTML = ''; return; }
-
-            let html = '<h3 style="color:var(--alerta); display:flex; align-items:center; gap:8px;">⚠️ Directivas de Jefatura Vigentes</h3>';
-            ordenes.reverse().forEach(o => html += `<div class="orden-card"><div class="orden-fecha">Recibida: ${o.fecha}</div><strong>ORDEN:</strong> ${o.texto}</div>`);
+            let html = '<h3 style="color:var(--alerta);">⚠️ Directivas / Tareas Recibidas</h3>';
+            ordenes.reverse().forEach(o => html += `<div class="orden-card"><div class="orden-fecha">Recibida: ${o.fecha}</div><strong>Mensaje:</strong> ${o.texto}</div>`);
             contenedor.innerHTML = html;
         }
 
@@ -569,34 +569,21 @@
             const contenedor = document.getElementById('feed-general');
             const feed = JSON.parse(localStorage.getItem('feed_general')) || [];
             if (feed.length === 0) return contenedor.innerHTML = '<p style="color:#94a3b8;">Sin actividad reciente de la Plana Mayor.</p>';
-
             let html = '';
             [...feed].reverse().slice(0, 20).forEach(f => {
-                let d = f.dato;
-                let b = ''; let text = '';
-                
-                if(f.area.includes('S1')) { b = '<span class="badge bg-verde">S1</span>'; text = f.area==='S1-CC' ? `Trámite Cambio Cuerpo: ${d.postulante} (${d.estado})` : `${d.personal} -> ${d.novedad}`; }
-                else if(f.area.includes('S2')) { b = '<span class="badge bg-amarillo">S2</span>'; text = `${d.tipo}: ${d.detalle}`; }
-                else if(f.area.includes('S3')) { b = '<span class="badge bg-rojo">S3</span>'; text = `Reserva PEA: ${d.actividad} en ${d.lugar}`; }
-                else if(f.area.includes('S4')) { b = '<span class="badge bg-azul">S4</span>'; text = f.area==='S4-Rac' ? `Pedido Racionamiento: ${d.identificacion} (${d.estado})` : `Material: ${d.identificacion} -> ${d.estado}`; }
-
-                html += `<div class="feed-item"><span class="feed-time">${d.fecha || d.fechaCarga}</span><div>${b} <strong>Actualización:</strong> ${text}</div></div>`;
+                let d = f.dato; let b = `<span class="badge bg-verde">${f.area}</span>`; let text = '';
+                if(f.area.includes('DOC')) text = `Radicó documento: ${d.nro} (Vto: ${d.termino})`;
+                else if(f.area.includes('S1')) text = `Actualización Personal/Sanidad`;
+                else if(f.area.includes('S2')) text = `Actualización Inteligencia/Seguridad`;
+                else if(f.area.includes('S3')) text = `Actualización Operaciones/Apresto`;
+                else if(f.area.includes('S4')) text = `Actualización Logística/Inspecciones`;
+                html += `<div class="feed-item"><span class="feed-time">${d.fecha || d.fechaCarga || new Date().toLocaleDateString()}</span><div>${b} <strong>Acción:</strong> ${text}</div></div>`;
             });
             contenedor.innerHTML = html;
         }
 
-        // --- UTILIDADES ---
         function mostrarToast(msg) { const t = document.getElementById('toast'); t.innerText = '✔️ ' + msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); }
-        function badgeStatus(txt) {
-            if(txt.includes('Enfermo') || txt.includes('Baja') || txt.includes('F/S') || txt.includes('Rigurosa')) return `<span class="badge bg-rojo">${txt}</span>`;
-            if(txt.includes('Comisión') || txt.includes('Mantenimiento') || txt.includes('Niebla') || txt.includes('Vientos')) return `<span class="badge bg-amarillo" style="color:black;">${txt}</span>`;
-            return `<span class="badge bg-verde">${txt}</span>`;
-        }
-        function limpiarBaseDatos() {
-            if(confirm('ATENCIÓN: ¿Desea eliminar permanentemente todos los registros y directivas cargados en el sistema?')) {
-                localStorage.clear(); cargarFeedGeneral(); mostrarToast('Base de datos reiniciada.');
-            }
-        }
+        function limpiarBaseDatos() { if(confirm('ATENCIÓN: ¿Desea eliminar permanentemente todos los registros y directivas?')) { localStorage.clear(); cargarFeedGeneral(); mostrarToast('Base de datos reiniciada.'); } }
     </script>
 </body>
 </html>
