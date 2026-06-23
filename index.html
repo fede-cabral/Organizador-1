@@ -32,16 +32,18 @@
         .login-box h2 { margin-top: 0; color: var(--verde-oscuro); text-align: center; border-bottom: 2px solid var(--verde-militar); padding-bottom: 10px; }
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .input-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .input-group input, .input-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
         .btn { width: 100%; padding: 12px; background: var(--verde-militar); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn:hover { background: var(--verde-oscuro); }
+        .btn-danger { background: var(--alerta); }
+        .btn-danger:hover { background: #b91c1c; }
 
         /* App Layout */
         #app-screen { display: none; }
         header { background-color: var(--verde-oscuro); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
         header h1 { margin: 0; font-size: 20px; }
         .user-info { display: flex; align-items: center; gap: 15px; }
-        .logout-btn { background: #dc2626; border: none; color: white; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+        .logout-btn { background: #dc2626; border: none; color: white; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
         .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
         
@@ -50,29 +52,34 @@
         .module-view.active { display: block; }
 
         /* Dashboard Grid */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 20px; }
         .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-top: 4px solid var(--verde-militar); }
         .card h3 { margin-top: 0; color: var(--verde-oscuro); font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         
         /* Tablas y Formularios */
+        .table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
         th, td { border-bottom: 1px solid #eee; padding: 10px; text-align: left; }
         th { background-color: var(--verde-claro); color: white; }
         
-        .form-section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .form-row input, .form-row select { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .form-section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--verde-militar); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .form-row input, .form-row select, .form-row textarea { flex: 1; min-width: 150px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         
-        .badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; }
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; display: inline-block; }
         .bg-rojo { background-color: var(--alerta); }
         .bg-verde { background-color: var(--ok); }
         .bg-amarillo { background-color: var(--aviso); }
 
         .orden-card { background: #fffbeb; border-left: 4px solid var(--aviso); padding: 15px; margin-bottom: 10px; border-radius: 4px; }
         .orden-fecha { font-size: 12px; color: #666; margin-bottom: 5px; }
+        
+        .feed-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
+        .feed-item:last-child { border-bottom: none; }
+        .feed-time { font-size: 11px; color: #888; font-weight: bold; }
 
         /* Notificaciones */
-        .toast { position: fixed; bottom: 20px; right: 20px; background: var(--verde-oscuro); color: white; padding: 15px 25px; border-radius: 4px; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: var(--verde-oscuro); color: white; padding: 15px 25px; border-radius: 4px; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 1000; }
     </style>
 </head>
 <body>
@@ -82,12 +89,13 @@
         <div style="text-align: center; margin-bottom: 20px;">
             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
             <h1 style="margin: 0;">SISTEMA C2</h1>
+            <p>Comando y Control Institucional</p>
         </div>
         <div class="login-box">
             <h2>Acceso Restringido</h2>
             <div class="input-group">
                 <label>Usuario (Rol):</label>
-                <select id="user-input" style="width: 100%; padding: 10px; margin-bottom: 10px;">
+                <select id="user-input">
                     <option value="jefe">Jefe de Regimiento</option>
                     <option value="s1">Jefe S1 (Personal)</option>
                     <option value="s2">Jefe S2 (Inteligencia)</option>
@@ -97,7 +105,7 @@
             </div>
             <div class="input-group">
                 <label>Contraseña:</label>
-                <input type="password" id="pass-input" placeholder="Para la demo es 1234 para todos">
+                <input type="password" id="pass-input" placeholder="Para la demo es 1234">
             </div>
             <button class="btn" onclick="login()">INGRESAR AL SISTEMA</button>
         </div>
@@ -106,9 +114,12 @@
     <!-- APLICACIÓN PRINCIPAL -->
     <div id="app-screen">
         <header>
-            <h1>Tablero de Comando - C2 Regimiento</h1>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <h1>Tablero de Comando - C2</h1>
+            </div>
             <div class="user-info">
-                <span id="display-user-name">Usuario</span>
+                <span id="display-user-name" style="font-weight: bold;">Usuario</span>
                 <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
             </div>
         </header>
@@ -119,47 +130,59 @@
             <div id="view-jefe" class="module-view">
                 <h2>Panel de Comando Estratégico</h2>
                 
-                <div class="form-section" style="border-left: 4px solid var(--alerta);">
-                    <h3 style="margin-top:0;">Emitir Directiva / Orden a Plana Mayor</h3>
-                    <div class="form-row">
-                        <select id="orden-area" style="max-width: 200px;">
-                            <option value="s1">A: S1 Personal</option>
-                            <option value="s2">A: S2 Inteligencia</option>
-                            <option value="s3">A: S3 Operaciones</option>
-                            <option value="s4">A: S4 Logística</option>
-                        </select>
-                        <input type="text" id="orden-texto" placeholder="Escriba la directiva u orden particular...">
-                        <button class="btn" style="max-width: 150px;" onclick="enviarOrden()">Emitir Orden</button>
+                <div class="grid">
+                    <!-- Formulario de Ordenes -->
+                    <div class="form-section" style="border-left-color: var(--alerta); grid-column: 1 / -1; margin-bottom: 0;">
+                        <h3 style="margin-top:0; color: var(--alerta);">Emitir Directiva / Orden de Comando</h3>
+                        <div class="form-row">
+                            <select id="orden-area" style="max-width: 200px;">
+                                <option value="s1">A: S1 Personal</option>
+                                <option value="s2">A: S2 Inteligencia</option>
+                                <option value="s3">A: S3 Operaciones</option>
+                                <option value="s4">A: S4 Logística</option>
+                            </select>
+                            <input type="text" id="orden-texto" placeholder="Escriba la directiva u orden particular...">
+                            <button class="btn btn-danger" style="max-width: 150px;" onclick="enviarOrden()">Emitir Orden</button>
+                        </div>
                     </div>
                 </div>
 
                 <div class="grid">
+                    <div class="card" style="grid-column: 1 / -1;">
+                        <h3>Últimas Novedades de la Plana Mayor (Tiempo Real)</h3>
+                        <div id="feed-general" style="max-height: 200px; overflow-y: auto;">
+                            <!-- Dinámico -->
+                        </div>
+                        <button class="btn" style="margin-top: 15px; width: auto; font-size: 12px; padding: 8px 15px;" onclick="limpiarBaseDatos()">Purgar Base de Datos (Simulacro)</button>
+                    </div>
+
                     <div class="card">
                         <h3>S1 - Estado de Fuerza</h3>
                         <h1 style="color: var(--verde-militar); font-size: 36px; margin: 10px 0;">92.5%</h1>
                         <p><span class="badge bg-verde">Operativo</span> Presentes: 452</p>
                         <hr style="border: 0.5px solid #eee;">
-                        <p><strong>Licencia Ord:</strong> 15 | <strong>Enfermos:</strong> 8</p>
-                        <p><strong>Actuaciones Justicia (RFP):</strong> 3 en curso</p>
+                        <p><strong>Licencia Ord / Esp:</strong> 15</p>
+                        <p><strong>Parte de Enfermo:</strong> 8</p>
+                        <p><strong>Comisión:</strong> 3</p>
                     </div>
                     <div class="card">
-                        <h3>S2 - Inteligencia (EEI)</h3>
-                        <p><strong>Seguridad Instalaciones:</strong> <span class="badge bg-verde">Nivel 1 (Normal)</span></p>
-                        <p><strong>Meteorología:</strong> Vientos N 25km/h. S/Novedad para tiro.</p>
-                        <p><strong>Contrainteligencia:</strong> Inspección perimetral realizada 0600hs.</p>
+                        <h3>S2 - Situación de Inteligencia</h3>
+                        <p><strong>Seguridad:</strong> <span class="badge bg-verde">Nivel 1 (Normal)</span></p>
+                        <p><strong>Doc Clasificada:</strong> 100% Auditada.</p>
+                        <p><strong>Clima y Terreno:</strong> Vientos N 25km/h. Transitabilidad caminos rurales: Regular (Barro).</p>
                     </div>
                     <div class="card">
-                        <h3>S3 - Instrucción y Adiestramiento</h3>
-                        <p><strong>Fase Actual:</strong> Adiestramiento Nivel Subunidad (Sección).</p>
+                        <h3>S3 - Operaciones (PEA)</h3>
+                        <p><strong>Fase Actual:</strong> Adiestramiento Nivel Subunidad.</p>
                         <p><strong>Actividad Principal:</strong> Tiro de Combate (Ca Ite A).</p>
-                        <p><strong>Estado Polígonos:</strong> Habilitados y con servicio sanidad.</p>
+                        <p><strong>OO Vigentes:</strong> OO 04/24 "Defensa Instalaciones".</p>
                     </div>
                     <div class="card">
-                        <h3>S4 - Abastecimiento y Mantenimiento</h3>
-                        <p><strong>Clase I (Raciones):</strong> <span class="badge bg-verde">15 días</span></p>
-                        <p><strong>Clase III (Gasoil):</strong> <span class="badge bg-amarillo">Reserva Reserva 30%</span></p>
+                        <h3>S4 - Situación Logística</h3>
+                        <p><strong>Clase I (Raciones):</strong> <span class="badge bg-verde">Stock 15 días</span></p>
+                        <p><strong>Clase III (Gasoil):</strong> <span class="badge bg-amarillo">Reserva 30%</span></p>
+                        <p><strong>Clase V (Munición):</strong> <span class="badge bg-verde">Dotación Completa</span></p>
                         <p><strong>Vehículos a Rueda:</strong> 12/15 Operativos</p>
-                        <p><strong>Vehículos Oruga (M113):</strong> 4/5 Operativos</p>
                     </div>
                 </div>
             </div>
@@ -167,21 +190,42 @@
             <!-- VISTA S1 -->
             <div id="view-s1" class="module-view">
                 <h2>S1 - División Personal</h2>
-                <div id="s1-ordenes"></div> <!-- Aquí se cargan las ordenes del jefe -->
+                <div id="s1-ordenes"></div>
                 
+                <div class="form-section">
+                    <h3 style="margin-top:0;">Registrar Nueva Novedad Diaria</h3>
+                    <div class="form-row">
+                        <select id="s1-grado" style="max-width: 120px;">
+                            <option>Sold Vol</option><option>Cbo</option><option>Cbo 1ro</option>
+                            <option>Sarg</option><option>Sarg 1ro</option>
+                            <option>Subt</option><option>Tte</option><option>Tte 1ro</option><option>Cap</option>
+                        </select>
+                        <input type="text" id="s1-apellido" placeholder="Apellido y Nombre">
+                        <select id="s1-novedad">
+                            <option value="Parte de Enfermo">Parte de Enfermo</option>
+                            <option value="Licencia Ordinaria">Licencia Ordinaria</option>
+                            <option value="Licencia Especial">Licencia Especial</option>
+                            <option value="Comisión">Comisión</option>
+                            <option value="Baja/Retiro">Baja/Retiro</option>
+                        </select>
+                        <button class="btn" style="max-width: 150px;" onclick="guardarRegistroS1()">Registrar</button>
+                    </div>
+                </div>
+
                 <div class="grid">
-                    <div class="card">
-                        <h3>Carga de Parte de Enfermo / Licencia</h3>
-                        <div class="form-row"><input type="text" placeholder="Grado y Apellido (Ej: Cbo 1ro PEREZ)"></div>
-                        <div class="form-row">
-                            <select><option>Sanidad</option><option>Licencia Ordinaria</option><option>Comisión</option></select>
+                    <div class="card" style="grid-column: 1 / -1;">
+                        <h3>Registro de Novedades (Parte Diario)</h3>
+                        <div class="table-container">
+                            <table id="tabla-s1">
+                                <thead><tr><th>Fecha/Hora</th><th>Grado y Nombre</th><th>Novedad</th></tr></thead>
+                                <tbody><!-- Dinamico --></tbody>
+                            </table>
                         </div>
-                        <button class="btn" onclick="mostrarToast('Novedad cargada en Base de Datos')">Registrar Novedad</button>
                     </div>
                     <div class="card">
-                        <h3>Legajos y Justicia (RFP)</h3>
+                        <h3>Justicia Militar (RFP)</h3>
                         <table>
-                            <tr><th>Personal</th><th>Estado</th><th>Causa</th></tr>
+                            <tr><th>Personal</th><th>Estado</th><th>Falta</th></tr>
                             <tr><td>Sold Vol GOMEZ</td><td><span class="badge bg-amarillo">Prev. Rig.</span></td><td>Falta al servicio</td></tr>
                             <tr><td>Sarg LOPEZ</td><td><span class="badge bg-verde">Resuelto</span></td><td>Llegada tarde</td></tr>
                         </table>
@@ -191,58 +235,106 @@
 
             <!-- VISTA S2 -->
             <div id="view-s2" class="module-view">
-                <h2>S2 - División Inteligencia</h2>
+                <h2>S2 - División Inteligencia y Seguridad</h2>
                 <div id="s2-ordenes"></div>
+                
+                <div class="form-section">
+                    <h3 style="margin-top:0;">Cargar Incidente de Seguridad / Apreciación</h3>
+                    <div class="form-row">
+                        <select id="s2-tipo" style="max-width: 200px;">
+                            <option value="Apreciación Meteorológica">Apreciación Meteorológica</option>
+                            <option value="Control Perimetral">Control Perimetral</option>
+                            <option value="Inspección Documentación">Inspección Documentación</option>
+                            <option value="Incidente Seguridad">Incidente de Seguridad</option>
+                        </select>
+                        <input type="text" id="s2-detalle" placeholder="Describa el evento o informe...">
+                        <button class="btn" style="max-width: 150px;" onclick="guardarRegistroS2()">Reportar</button>
+                    </div>
+                </div>
+
                 <div class="grid">
-                    <div class="card">
-                        <h3>Apreciación Meteorológica y Terreno</h3>
-                        <textarea style="width:100%; height:80px; margin-bottom:10px;" placeholder="Detalle condiciones de transitabilidad..."></textarea>
-                        <button class="btn" onclick="mostrarToast('Apreciación actualizada')">Actualizar Informe</button>
+                    <div class="card" style="grid-column: 1 / -1;">
+                        <h3>Libro Histórico de Inteligencia</h3>
+                        <div class="table-container">
+                            <table id="tabla-s2">
+                                <thead><tr><th>Fecha/Hora</th><th>Tipo de Informe</th><th>Detalle / Apreciación</th></tr></thead>
+                                <tbody><!-- Dinamico --></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- VISTA S3 -->
             <div id="view-s3" class="module-view">
-                <h2>S3 - División Operaciones</h2>
+                <h2>S3 - División Operaciones e Instrucción</h2>
                 <div id="s3-ordenes"></div>
+                
+                <div class="form-section">
+                    <h3 style="margin-top:0;">Programar Actividad de Instrucción (PEA)</h3>
+                    <div class="form-row">
+                        <select id="s3-subunidad" style="max-width: 150px;">
+                            <option value="Ca Ite A">Ca Ite A</option>
+                            <option value="Ca Ite B">Ca Ite B</option>
+                            <option value="Ca Cdo Ser">Ca Cdo Ser</option>
+                        </select>
+                        <input type="date" id="s3-fecha" style="max-width: 150px;">
+                        <input type="text" id="s3-actividad" placeholder="Actividad (Ej: Tiro Combate / Marcha)">
+                        <select id="s3-lugar" style="max-width: 150px;">
+                            <option value="Polígono">Polígono</option>
+                            <option value="Terreno">Terreno</option>
+                            <option value="Plaza Armas">Plaza de Armas</option>
+                        </select>
+                        <button class="btn" style="max-width: 150px;" onclick="guardarRegistroS3()">Programar</button>
+                    </div>
+                </div>
+
                 <div class="grid">
-                    <div class="card">
-                        <h3>Reserva de Instalaciones / Polígonos</h3>
-                        <div class="form-row">
-                            <select><option>Ca Ite A</option><option>Ca Ite B</option><option>Ca Cdo</option></select>
-                            <input type="date">
+                    <div class="card" style="grid-column: 1 / -1;">
+                        <h3>Calendario de Actividades y Órdenes de Operaciones</h3>
+                        <div class="table-container">
+                            <table id="tabla-s3">
+                                <thead><tr><th>Fecha Programada</th><th>Subunidad</th><th>Actividad (PEA)</th><th>Lugar/Instalación</th></tr></thead>
+                                <tbody><!-- Dinamico --></tbody>
+                            </table>
                         </div>
-                        <button class="btn" onclick="mostrarToast('Instalación asignada')">Aprobar Uso</button>
                     </div>
                 </div>
             </div>
 
             <!-- VISTA S4 -->
             <div id="view-s4" class="module-view">
-                <h2>S4 - División Logística</h2>
+                <h2>S4 - División Logística y Materiales</h2>
                 <div id="s4-ordenes"></div>
-                <div class="grid">
-                    <div class="card">
-                        <h3>Estado Parque Automotor</h3>
-                        <table>
-                            <tr><th>Vehículo</th><th>NI / Matrícula</th><th>Estado</th></tr>
-                            <tr><td>MB 230G</td><td>NI 45012</td><td><span class="badge bg-verde">Servicio</span></td></tr>
-                            <tr><td>Unimog 416</td><td>NI 33021</td><td><span class="badge bg-rojo">F/Servicio</span></td></tr>
-                            <tr><td>VC M113</td><td>NI 11099</td><td><span class="badge bg-verde">Servicio</span></td></tr>
-                        </table>
+                
+                <div class="form-section">
+                    <h3 style="margin-top:0;">Actualizar Estado de Parque Automotor / Materiales</h3>
+                    <div class="form-row">
+                        <select id="s4-clase" style="max-width: 250px;">
+                            <option value="Clase VII (Vehículo a Rueda)">Vehículo a Rueda (MB/Unimog)</option>
+                            <option value="Clase VII (Vehículo Oruga)">Vehículo Oruga (M113)</option>
+                            <option value="Clase II (Armamento)">Armamento Individual</option>
+                            <option value="Clase V (Munición)">Munición / Explosivos</option>
+                        </select>
+                        <input type="text" id="s4-identificacion" placeholder="NI / Matrícula / Lote">
+                        <select id="s4-estado" style="max-width: 150px;">
+                            <option value="Operativo">Operativo (Servicio)</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Fuera de Servicio">Fuera de Servicio</option>
+                        </select>
+                        <button class="btn" style="max-width: 150px;" onclick="guardarRegistroS4()">Actualizar</button>
                     </div>
-                    <div class="card">
-                        <h3>Actualizar Niveles de Abastecimiento</h3>
-                        <div class="form-row">
-                            <select>
-                                <option>Clase I (Raciones)</option>
-                                <option>Clase III (Combustibles)</option>
-                                <option>Clase V (Munición)</option>
-                            </select>
-                            <input type="text" placeholder="Nivel actual (Ej: 80%)">
+                </div>
+
+                <div class="grid">
+                    <div class="card" style="grid-column: 1 / -1;">
+                        <h3>Reporte de Estado Logístico</h3>
+                        <div class="table-container">
+                            <table id="tabla-s4">
+                                <thead><tr><th>Fecha Actualización</th><th>Clase / Tipo</th><th>Identificación (NI)</th><th>Estado</th></tr></thead>
+                                <tbody><!-- Dinamico --></tbody>
+                            </table>
                         </div>
-                        <button class="btn" onclick="mostrarToast('Nivel logístico actualizado')">Cargar Stock</button>
                     </div>
                 </div>
             </div>
@@ -282,8 +374,15 @@
                 // Mostrar solo la vista del usuario logueado
                 document.getElementById(roles[user].view).classList.add('active');
 
-                // Si no es el jefe, cargar las ordenes recibidas
-                if(user !== 'jefe') cargarOrdenes(user);
+                // Cargar datos persistentes
+                cargarTodasLasTablas();
+
+                // Manejo especial de vistas
+                if(user === 'jefe') {
+                    cargarFeedGeneral();
+                } else {
+                    cargarOrdenesRecibidas(user);
+                }
                 
                 mostrarToast('Sesión iniciada: ' + roles[user].name);
             } else {
@@ -299,57 +398,206 @@
             document.getElementById('login-screen').style.display = 'flex';
         }
 
-        // JEFE: EMITIR ORDEN Y GUARDAR EN LOCALSTORAGE
+        // ==========================================
+        // LÓGICA DE ALMACENAMIENTO (LOCALSTORAGE)
+        // ==========================================
+
+        function guardarDatoGen(claveStorage, objetoDato) {
+            let datos = JSON.parse(localStorage.getItem(claveStorage)) || [];
+            datos.push(objetoDato);
+            localStorage.setItem(claveStorage, JSON.stringify(datos));
+            
+            // También lo guardamos en un Feed General para el Jefe
+            let feed = JSON.parse(localStorage.getItem('feed_general')) || [];
+            feed.push({ area: claveStorage, dato: objetoDato });
+            localStorage.setItem('feed_general', JSON.stringify(feed));
+        }
+
+        // GUARDADO S1
+        function guardarRegistroS1() {
+            const grado = document.getElementById('s1-grado').value;
+            const apellido = document.getElementById('s1-apellido').value;
+            const novedad = document.getElementById('s1-novedad').value;
+            
+            if(!apellido) return alert('Ingrese el apellido.');
+
+            guardarDatoGen('datos_s1', {
+                fecha: new Date().toLocaleString(),
+                personal: `${grado} ${apellido}`,
+                novedad: novedad
+            });
+            
+            document.getElementById('s1-apellido').value = '';
+            cargarTodasLasTablas();
+            mostrarToast('Novedad de Personal registrada.');
+        }
+
+        // GUARDADO S2
+        function guardarRegistroS2() {
+            const tipo = document.getElementById('s2-tipo').value;
+            const detalle = document.getElementById('s2-detalle').value;
+            
+            if(!detalle) return alert('Ingrese el detalle del informe.');
+
+            guardarDatoGen('datos_s2', {
+                fecha: new Date().toLocaleString(),
+                tipo: tipo,
+                detalle: detalle
+            });
+            
+            document.getElementById('s2-detalle').value = '';
+            cargarTodasLasTablas();
+            mostrarToast('Informe de Inteligencia cargado.');
+        }
+
+        // GUARDADO S3
+        function guardarRegistroS3() {
+            const subunidad = document.getElementById('s3-subunidad').value;
+            const fechaProg = document.getElementById('s3-fecha').value;
+            const actividad = document.getElementById('s3-actividad').value;
+            const lugar = document.getElementById('s3-lugar').value;
+            
+            if(!actividad || !fechaProg) return alert('Complete fecha y actividad.');
+
+            guardarDatoGen('datos_s3', {
+                fechaCarga: new Date().toLocaleString(),
+                fechaProg: fechaProg,
+                subunidad: subunidad,
+                actividad: actividad,
+                lugar: lugar
+            });
+            
+            document.getElementById('s3-actividad').value = '';
+            cargarTodasLasTablas();
+            mostrarToast('Actividad PEA programada.');
+        }
+
+        // GUARDADO S4
+        function guardarRegistroS4() {
+            const clase = document.getElementById('s4-clase').value;
+            const id = document.getElementById('s4-identificacion').value;
+            const estado = document.getElementById('s4-estado').value;
+            
+            if(!id) return alert('Ingrese NI o Matrícula.');
+
+            guardarDatoGen('datos_s4', {
+                fecha: new Date().toLocaleString(),
+                clase: clase,
+                identificacion: id,
+                estado: estado
+            });
+            
+            document.getElementById('s4-identificacion').value = '';
+            cargarTodasLasTablas();
+            mostrarToast('Estado Logístico actualizado.');
+        }
+
+        // JEFE: EMITIR ORDEN
         function enviarOrden() {
             const area = document.getElementById('orden-area').value;
             const texto = document.getElementById('orden-texto').value;
-            
-            if(!texto) return alert('Escriba una orden antes de enviar.');
+            if(!texto) return alert('Escriba una orden.');
 
-            const nuevaOrden = {
-                fecha: new Date().toLocaleString(),
-                texto: texto
-            };
-
-            // Traer ordenes previas de localStorage o crear array nuevo
             let ordenesGuardadas = JSON.parse(localStorage.getItem('ordenes_' + area)) || [];
-            ordenesGuardadas.push(nuevaOrden);
-            
-            // Guardar
+            ordenesGuardadas.push({ fecha: new Date().toLocaleString(), texto: texto });
             localStorage.setItem('ordenes_' + area, JSON.stringify(ordenesGuardadas));
             
             document.getElementById('orden-texto').value = '';
             mostrarToast('Directiva enviada a ' + area.toUpperCase());
         }
 
-        // S-STAFF: LEER ORDENES DEL LOCALSTORAGE
-        function cargarOrdenes(area) {
-            const contenedor = document.getElementById(area + '-ordenes');
-            const ordenesGuardadas = JSON.parse(localStorage.getItem('ordenes_' + area)) || [];
-            
-            if (ordenesGuardadas.length === 0) {
-                contenedor.innerHTML = '';
+        // ==========================================
+        // LÓGICA DE RENDERIZADO (MOSTRAR DATOS)
+        // ==========================================
+
+        function cargarTodasLasTablas() {
+            renderTabla('datos_s1', 'tabla-s1', (item) => `<tr><td>${item.fecha}</td><td>${item.personal}</td><td>${obtenerBadgeNovedad(item.novedad)}</td></tr>`);
+            renderTabla('datos_s2', 'tabla-s2', (item) => `<tr><td>${item.fecha}</td><td><strong>${item.tipo}</strong></td><td>${item.detalle}</td></tr>`);
+            renderTabla('datos_s3', 'tabla-s3', (item) => `<tr><td>${item.fechaProg}</td><td>${item.subunidad}</td><td>${item.actividad}</td><td>${item.lugar}</td></tr>`);
+            renderTabla('datos_s4', 'tabla-s4', (item) => `<tr><td>${item.fecha}</td><td>${item.clase}</td><td>${item.identificacion}</td><td>${obtenerBadgeEstado(item.estado)}</td></tr>`);
+        }
+
+        function renderTabla(claveStorage, idTabla, fnFila) {
+            const datos = JSON.parse(localStorage.getItem(claveStorage)) || [];
+            const tbody = document.getElementById(idTabla).getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+            if(datos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">Sin registros recientes.</td></tr>';
                 return;
             }
+            // Mostrar últimos cargados arriba
+            [...datos].reverse().forEach(item => {
+                tbody.innerHTML += fnFila(item);
+            });
+        }
 
-            let html = '<h3>Directivas de Jefatura</h3>';
-            // Mostrar las ordenes invertidas (la más nueva arriba)
+        function cargarOrdenesRecibidas(area) {
+            const contenedor = document.getElementById(area + '-ordenes');
+            const ordenesGuardadas = JSON.parse(localStorage.getItem('ordenes_' + area)) || [];
+            if (ordenesGuardadas.length === 0) { contenedor.innerHTML = ''; return; }
+
+            let html = '<h3 style="color:var(--aviso);">Directivas del Jefe de Regimiento</h3>';
             ordenesGuardadas.reverse().forEach(orden => {
-                html += `
-                    <div class="orden-card">
-                        <div class="orden-fecha">Recibida: ${orden.fecha}</div>
-                        <strong>ORDEN:</strong> ${orden.texto}
-                    </div>`;
+                html += `<div class="orden-card"><div class="orden-fecha">Recibida: ${orden.fecha}</div><strong>ORDEN:</strong> ${orden.texto}</div>`;
             });
             contenedor.innerHTML = html;
         }
 
-        // UI: Mostrar Notificaciones
+        function cargarFeedGeneral() {
+            const contenedor = document.getElementById('feed-general');
+            const feed = JSON.parse(localStorage.getItem('feed_general')) || [];
+            
+            if (feed.length === 0) {
+                contenedor.innerHTML = '<p style="color:#888; font-style:italic;">No hay actividad reciente de las divisiones.</p>';
+                return;
+            }
+
+            let html = '';
+            [...feed].reverse().slice(0, 15).forEach(f => {
+                let badgeArea = '';
+                let desc = '';
+                if(f.area === 'datos_s1') { badgeArea = '<span class="badge bg-verde">S1</span>'; desc = `${f.dato.personal} -> ${f.dato.novedad}`; }
+                if(f.area === 'datos_s2') { badgeArea = '<span class="badge bg-amarillo">S2</span>'; desc = `${f.dato.tipo}: ${f.dato.detalle}`; }
+                if(f.area === 'datos_s3') { badgeArea = '<span class="badge bg-rojo">S3</span>'; desc = `PEA: ${f.dato.actividad} (${f.dato.subunidad})`; }
+                if(f.area === 'datos_s4') { badgeArea = '<span class="badge" style="background:#0284c7;">S4</span>'; desc = `Material: ${f.dato.identificacion} -> ${f.dato.estado}`; }
+                
+                html += `<div class="feed-item">
+                            <span class="feed-time">${f.dato.fecha || f.dato.fechaCarga}</span> - 
+                            ${badgeArea} <strong>Actualización:</strong> ${desc}
+                         </div>`;
+            });
+            contenedor.innerHTML = html;
+        }
+
+        // ==========================================
+        // UTILIDADES Y DISEÑO
+        // ==========================================
+
         function mostrarToast(mensaje) {
             const toast = document.getElementById('toast');
             toast.innerText = mensaje;
             toast.style.display = 'block';
             setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        function obtenerBadgeNovedad(texto) {
+            if(texto.includes('Enfermo') || texto.includes('Baja')) return `<span class="badge bg-rojo">${texto}</span>`;
+            if(texto.includes('Comisión')) return `<span class="badge bg-amarillo">${texto}</span>`;
+            return `<span class="badge bg-verde">${texto}</span>`;
+        }
+
+        function obtenerBadgeEstado(texto) {
+            if(texto === 'Operativo') return `<span class="badge bg-verde">${texto}</span>`;
+            if(texto === 'Mantenimiento') return `<span class="badge bg-amarillo">${texto}</span>`;
+            return `<span class="badge bg-rojo">${texto}</span>`;
+        }
+
+        function limpiarBaseDatos() {
+            if(confirm('¿Está seguro de purgar toda la base de datos de prueba? Esto borrará todas las novedades y órdenes.')) {
+                localStorage.clear();
+                cargarFeedGeneral();
+                mostrarToast('Base de datos purgada con éxito.');
+            }
         }
     </script>
 </body>
