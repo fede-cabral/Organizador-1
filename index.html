@@ -3,163 +3,353 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Comando y Control - Regimiento</title>
+    <title>C2 - Regimiento</title>
     <style>
         :root {
             --verde-militar: #4A5D23;
             --verde-oscuro: #2C3518;
-            --gris-claro: #F4F4F4;
-            --gris-oscuro: #333;
-            --alerta-roja: #8B0000;
+            --verde-claro: #8da168;
+            --gris-bg: #e2e8f0;
+            --texto-oscuro: #1e293b;
+            --alerta: #dc2626;
+            --ok: #16a34a;
+            --aviso: #ca8a04;
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--gris-claro); }
+
+        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
         
-        /* Header y Navegación */
+        body { margin: 0; background-color: var(--gris-bg); color: var(--texto-oscuro); }
+
+        /* Login Screen */
+        #login-screen {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; background-color: var(--verde-oscuro); color: white;
+        }
+        .login-box {
+            background: white; padding: 40px; border-radius: 8px; color: var(--texto-oscuro);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 100%; max-width: 400px;
+        }
+        .login-box h2 { margin-top: 0; color: var(--verde-oscuro); text-align: center; border-bottom: 2px solid var(--verde-militar); padding-bottom: 10px; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .input-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .btn { width: 100%; padding: 12px; background: var(--verde-militar); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: var(--verde-oscuro); }
+
+        /* App Layout */
+        #app-screen { display: none; }
         header { background-color: var(--verde-oscuro); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        header h1 { margin: 0; font-size: 24px; }
+        header h1 { margin: 0; font-size: 20px; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .logout-btn { background: #dc2626; border: none; color: white; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
         
-        .tabs { display: flex; background-color: var(--verde-militar); overflow-x: auto; }
-        .tab-btn { background: none; border: none; color: white; padding: 15px 20px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
-        .tab-btn:hover { background-color: rgba(255,255,255,0.2); }
-        .tab-btn.active { background-color: var(--gris-claro); color: var(--verde-oscuro); border-top: 3px solid var(--verde-oscuro); }
+        /* Modulos y Vistas */
+        .module-view { display: none; }
+        .module-view.active { display: block; }
+
+        /* Dashboard Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-top: 4px solid var(--verde-militar); }
+        .card h3 { margin-top: 0; color: var(--verde-oscuro); font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         
-        /* Contenido de las Pestañas */
-        .tab-content { display: none; padding: 20px; }
-        .tab-content.active { display: block; }
+        /* Tablas y Formularios */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { border-bottom: 1px solid #eee; padding: 10px; text-align: left; }
+        th { background-color: var(--verde-claro); color: white; }
         
-        /* Tarjetas de Dashboard */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 5px solid var(--verde-militar); }
-        .card h3 { margin-top: 0; color: var(--gris-oscuro); }
-        .card.alert { border-left-color: var(--alerta-roja); }
+        .form-section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .form-row input, .form-row select { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         
-        /* Tablas */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: var(--verde-militar); color: white; }
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; }
+        .bg-rojo { background-color: var(--alerta); }
+        .bg-verde { background-color: var(--ok); }
+        .bg-amarillo { background-color: var(--aviso); }
+
+        .orden-card { background: #fffbeb; border-left: 4px solid var(--aviso); padding: 15px; margin-bottom: 10px; border-radius: 4px; }
+        .orden-fecha { font-size: 12px; color: #666; margin-bottom: 5px; }
+
+        /* Notificaciones */
+        .toast { position: fixed; bottom: 20px; right: 20px; background: var(--verde-oscuro); color: white; padding: 15px 25px; border-radius: 4px; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Tablero de Comando - C2 Regimiento</h1>
-        <div id="usuario-activo">Usuario: <strong>Jefe de Regimiento (Admin)</strong></div>
-    </header>
-
-    <div class="tabs">
-        <button class="tab-btn active" onclick="openTab(event, 'Jefe')">Jefatura</button>
-        <button class="tab-btn" onclick="openTab(event, 'SegundoJefe')">2do Jefe</button>
-        <button class="tab-btn" onclick="openTab(event, 'S1')">S1 (Personal)</button>
-        <button class="tab-btn" onclick="openTab(event, 'S2')">S2 (Inteligencia)</button>
-        <button class="tab-btn" onclick="openTab(event, 'S3')">S3 (Operaciones)</button>
-        <button class="tab-btn" onclick="openTab(event, 'S4')">S4 (Logística)</button>
-    </div>
-
-    <div id="Jefe" class="tab-content active">
-        <h2>Visión Global (Nivel Estratégico)</h2>
-        <p>Resumen automatizado de las 4 áreas de conducción.</p>
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3>Estado de Fuerza</h3>
-                <h1 style="color: var(--verde-militar); font-size: 40px; margin: 10px 0;">92%</h1>
-                <p>Efectivos Presentes. 8% en Licencia/Sanidad.</p>
+    <!-- PANTALLA DE LOGIN -->
+    <div id="login-screen">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <h1 style="margin: 0;">SISTEMA C2</h1>
+        </div>
+        <div class="login-box">
+            <h2>Acceso Restringido</h2>
+            <div class="input-group">
+                <label>Usuario (Rol):</label>
+                <select id="user-input" style="width: 100%; padding: 10px; margin-bottom: 10px;">
+                    <option value="jefe">Jefe de Regimiento</option>
+                    <option value="s1">Jefe S1 (Personal)</option>
+                    <option value="s2">Jefe S2 (Inteligencia)</option>
+                    <option value="s3">Jefe S3 (Operaciones)</option>
+                    <option value="s4">Jefe S4 (Logística)</option>
+                </select>
             </div>
-            <div class="card">
-                <h3>Disponibilidad Operativa</h3>
-                <p><strong>Vehículos (S4):</strong> 15/20 Operativos</p>
-                <p><strong>Munición (S4):</strong> Nivel Óptimo</p>
-                <p><strong>Nivel Instrucción (S3):</strong> Etapa Subunidad</p>
+            <div class="input-group">
+                <label>Contraseña:</label>
+                <input type="password" id="pass-input" placeholder="Para la demo es 1234 para todos">
             </div>
-            <div class="card alert">
-                <h3>Novedades de Trascendencia</h3>
-                <p>🔴 1x Vehículo Unimog fuera de servicio (Falla motor).</p>
-                <p>🟡 Alerta meteorológica: Fuertes vientos zona de polígono.</p>
-            </div>
+            <button class="btn" onclick="login()">INGRESAR AL SISTEMA</button>
         </div>
     </div>
 
-    <div id="SegundoJefe" class="tab-content">
-        <h2>Supervisión y Ejecución (Nivel Coordinación)</h2>
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3>Servicios de Guardia</h3>
-                <p>Oficial de Servicio: Tte 1ro GOMEZ</p>
-                <p>Estado de Puestos: Cubiertos y sin novedades.</p>
+    <!-- APLICACIÓN PRINCIPAL -->
+    <div id="app-screen">
+        <header>
+            <h1>Tablero de Comando - C2 Regimiento</h1>
+            <div class="user-info">
+                <span id="display-user-name">Usuario</span>
+                <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
             </div>
-            <div class="card">
-                <h3>Justicia y Disciplina</h3>
-                <p>Sanciones en trámite: 2</p>
-                <p>Actuaciones por Accidente: 0</p>
+        </header>
+
+        <div class="container">
+            
+            <!-- VISTA JEFE DE REGIMIENTO -->
+            <div id="view-jefe" class="module-view">
+                <h2>Panel de Comando Estratégico</h2>
+                
+                <div class="form-section" style="border-left: 4px solid var(--alerta);">
+                    <h3 style="margin-top:0;">Emitir Directiva / Orden a Plana Mayor</h3>
+                    <div class="form-row">
+                        <select id="orden-area" style="max-width: 200px;">
+                            <option value="s1">A: S1 Personal</option>
+                            <option value="s2">A: S2 Inteligencia</option>
+                            <option value="s3">A: S3 Operaciones</option>
+                            <option value="s4">A: S4 Logística</option>
+                        </select>
+                        <input type="text" id="orden-texto" placeholder="Escriba la directiva u orden particular...">
+                        <button class="btn" style="max-width: 150px;" onclick="enviarOrden()">Emitir Orden</button>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>S1 - Estado de Fuerza</h3>
+                        <h1 style="color: var(--verde-militar); font-size: 36px; margin: 10px 0;">92.5%</h1>
+                        <p><span class="badge bg-verde">Operativo</span> Presentes: 452</p>
+                        <hr style="border: 0.5px solid #eee;">
+                        <p><strong>Licencia Ord:</strong> 15 | <strong>Enfermos:</strong> 8</p>
+                        <p><strong>Actuaciones Justicia (RFP):</strong> 3 en curso</p>
+                    </div>
+                    <div class="card">
+                        <h3>S2 - Inteligencia (EEI)</h3>
+                        <p><strong>Seguridad Instalaciones:</strong> <span class="badge bg-verde">Nivel 1 (Normal)</span></p>
+                        <p><strong>Meteorología:</strong> Vientos N 25km/h. S/Novedad para tiro.</p>
+                        <p><strong>Contrainteligencia:</strong> Inspección perimetral realizada 0600hs.</p>
+                    </div>
+                    <div class="card">
+                        <h3>S3 - Instrucción y Adiestramiento</h3>
+                        <p><strong>Fase Actual:</strong> Adiestramiento Nivel Subunidad (Sección).</p>
+                        <p><strong>Actividad Principal:</strong> Tiro de Combate (Ca Ite A).</p>
+                        <p><strong>Estado Polígonos:</strong> Habilitados y con servicio sanidad.</p>
+                    </div>
+                    <div class="card">
+                        <h3>S4 - Abastecimiento y Mantenimiento</h3>
+                        <p><strong>Clase I (Raciones):</strong> <span class="badge bg-verde">15 días</span></p>
+                        <p><strong>Clase III (Gasoil):</strong> <span class="badge bg-amarillo">Reserva Reserva 30%</span></p>
+                        <p><strong>Vehículos a Rueda:</strong> 12/15 Operativos</p>
+                        <p><strong>Vehículos Oruga (M113):</strong> 4/5 Operativos</p>
+                    </div>
+                </div>
             </div>
+
+            <!-- VISTA S1 -->
+            <div id="view-s1" class="module-view">
+                <h2>S1 - División Personal</h2>
+                <div id="s1-ordenes"></div> <!-- Aquí se cargan las ordenes del jefe -->
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>Carga de Parte de Enfermo / Licencia</h3>
+                        <div class="form-row"><input type="text" placeholder="Grado y Apellido (Ej: Cbo 1ro PEREZ)"></div>
+                        <div class="form-row">
+                            <select><option>Sanidad</option><option>Licencia Ordinaria</option><option>Comisión</option></select>
+                        </div>
+                        <button class="btn" onclick="mostrarToast('Novedad cargada en Base de Datos')">Registrar Novedad</button>
+                    </div>
+                    <div class="card">
+                        <h3>Legajos y Justicia (RFP)</h3>
+                        <table>
+                            <tr><th>Personal</th><th>Estado</th><th>Causa</th></tr>
+                            <tr><td>Sold Vol GOMEZ</td><td><span class="badge bg-amarillo">Prev. Rig.</span></td><td>Falta al servicio</td></tr>
+                            <tr><td>Sarg LOPEZ</td><td><span class="badge bg-verde">Resuelto</span></td><td>Llegada tarde</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA S2 -->
+            <div id="view-s2" class="module-view">
+                <h2>S2 - División Inteligencia</h2>
+                <div id="s2-ordenes"></div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Apreciación Meteorológica y Terreno</h3>
+                        <textarea style="width:100%; height:80px; margin-bottom:10px;" placeholder="Detalle condiciones de transitabilidad..."></textarea>
+                        <button class="btn" onclick="mostrarToast('Apreciación actualizada')">Actualizar Informe</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA S3 -->
+            <div id="view-s3" class="module-view">
+                <h2>S3 - División Operaciones</h2>
+                <div id="s3-ordenes"></div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Reserva de Instalaciones / Polígonos</h3>
+                        <div class="form-row">
+                            <select><option>Ca Ite A</option><option>Ca Ite B</option><option>Ca Cdo</option></select>
+                            <input type="date">
+                        </div>
+                        <button class="btn" onclick="mostrarToast('Instalación asignada')">Aprobar Uso</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA S4 -->
+            <div id="view-s4" class="module-view">
+                <h2>S4 - División Logística</h2>
+                <div id="s4-ordenes"></div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Estado Parque Automotor</h3>
+                        <table>
+                            <tr><th>Vehículo</th><th>NI / Matrícula</th><th>Estado</th></tr>
+                            <tr><td>MB 230G</td><td>NI 45012</td><td><span class="badge bg-verde">Servicio</span></td></tr>
+                            <tr><td>Unimog 416</td><td>NI 33021</td><td><span class="badge bg-rojo">F/Servicio</span></td></tr>
+                            <tr><td>VC M113</td><td>NI 11099</td><td><span class="badge bg-verde">Servicio</span></td></tr>
+                        </table>
+                    </div>
+                    <div class="card">
+                        <h3>Actualizar Niveles de Abastecimiento</h3>
+                        <div class="form-row">
+                            <select>
+                                <option>Clase I (Raciones)</option>
+                                <option>Clase III (Combustibles)</option>
+                                <option>Clase V (Munición)</option>
+                            </select>
+                            <input type="text" placeholder="Nivel actual (Ej: 80%)">
+                        </div>
+                        <button class="btn" onclick="mostrarToast('Nivel logístico actualizado')">Cargar Stock</button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <div id="S1" class="tab-content">
-        <h2>S1 - Personal</h2>
-        <button style="padding: 10px; background: var(--verde-militar); color: white; border: none; border-radius: 5px; cursor: pointer;">+ Cargar Parte Diario</button>
-        <table>
-            <tr>
-                <th>Subunidad</th>
-                <th>Presentes</th>
-                <th>Licencia</th>
-                <th>Sanidad</th>
-                <th>En Cambio de Cuerpo</th>
-            </tr>
-            <tr><td>Ca Ite A</td><td>85</td><td>5</td><td>2</td><td>1</td></tr>
-            <tr><td>Ca Ite B</td><td>82</td><td>8</td><td>1</td><td>0</td></tr>
-            <tr><td>Ca Cdo y Ser</td><td>105</td><td>10</td><td>3</td><td>2</td></tr>
-        </table>
-    </div>
-
-    <div id="S2" class="tab-content">
-        <h2>S2 - Inteligencia y Seguridad</h2>
-        <div class="card">
-            <h3>Apreciación de Situación Local</h3>
-            <p><strong>Clima:</strong> Despejado, 22°C. Ideal para instrucción en el terreno.</p>
-            <p><strong>Tránsito/Rutas:</strong> Circulación normal en Caminos de las Sierras. Accesos a la guarnición despejados.</p>
-            <p><strong>Seguridad de Instalaciones:</strong> Controles de acceso perimetral reforzados.</p>
-        </div>
-    </div>
-
-    <div id="S3" class="tab-content">
-        <h2>S3 - Operaciones e Instrucción</h2>
-        <div class="card">
-            <h3>Calendario de Actividades</h3>
-            <ul>
-                <li><strong>Hoy, 0800hs:</strong> Tiro de combate (Ca Ite A). Polígono de la Guarnición.</li>
-                <li><strong>Mañana, 1400hs:</strong> Planeamiento Táctico Urbano (Jefes de Sección).</li>
-            </ul>
-        </div>
-    </div>
-
-    <div id="S4" class="tab-content">
-        <h2>S4 - Logística</h2>
-        <table>
-            <tr>
-                <th>Clase</th>
-                <th>Rubro</th>
-                <th>Estado</th>
-                <th>Observaciones</th>
-            </tr>
-            <tr><td>I</td><td>Racionamiento</td><td>🟢 Óptimo</td><td>Raciones calientes aseguradas por 15 días.</td></tr>
-            <tr><td>III</td><td>Combustible</td><td>🟡 Medio</td><td>Solicitando reabastecimiento de gasoil.</td></tr>
-            <tr><td>V</td><td>Munición</td><td>🟢 Óptimo</td><td>Aprobado para tiro de Ca Ite A.</td></tr>
-        </table>
-    </div>
+    <!-- TOAST ALERTA -->
+    <div id="toast" class="toast">Acción realizada con éxito.</div>
 
     <script>
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
+        // Simulador de Base de Datos para Usuarios
+        const roles = {
+            'jefe': { pass: '1234', name: 'Jefe de Regimiento', view: 'view-jefe' },
+            's1': { pass: '1234', name: 'Oficial de Personal (S1)', view: 'view-s1' },
+            's2': { pass: '1234', name: 'Oficial de Inteligencia (S2)', view: 'view-s2' },
+            's3': { pass: '1234', name: 'Oficial de Operaciones (S3)', view: 'view-s3' },
+            's4': { pass: '1234', name: 'Oficial de Logística (S4)', view: 'view-s4' }
+        };
+
+        let currentRole = null;
+
+        // INICIO DE SESIÓN
+        function login() {
+            const user = document.getElementById('user-input').value;
+            const pass = document.getElementById('pass-input').value;
+
+            if (roles[user] && roles[user].pass === pass) {
+                currentRole = user;
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-screen').style.display = 'block';
+                document.getElementById('display-user-name').innerText = roles[user].name;
+                
+                // Ocultar todas las vistas
+                document.querySelectorAll('.module-view').forEach(el => el.classList.remove('active'));
+                
+                // Mostrar solo la vista del usuario logueado
+                document.getElementById(roles[user].view).classList.add('active');
+
+                // Si no es el jefe, cargar las ordenes recibidas
+                if(user !== 'jefe') cargarOrdenes(user);
+                
+                mostrarToast('Sesión iniciada: ' + roles[user].name);
+            } else {
+                alert('Contraseña incorrecta. (Use 1234)');
             }
-            tablinks = document.getElementsByClassName("tab-btn");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // CERRAR SESIÓN
+        function logout() {
+            currentRole = null;
+            document.getElementById('pass-input').value = '';
+            document.getElementById('app-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'flex';
+        }
+
+        // JEFE: EMITIR ORDEN Y GUARDAR EN LOCALSTORAGE
+        function enviarOrden() {
+            const area = document.getElementById('orden-area').value;
+            const texto = document.getElementById('orden-texto').value;
+            
+            if(!texto) return alert('Escriba una orden antes de enviar.');
+
+            const nuevaOrden = {
+                fecha: new Date().toLocaleString(),
+                texto: texto
+            };
+
+            // Traer ordenes previas de localStorage o crear array nuevo
+            let ordenesGuardadas = JSON.parse(localStorage.getItem('ordenes_' + area)) || [];
+            ordenesGuardadas.push(nuevaOrden);
+            
+            // Guardar
+            localStorage.setItem('ordenes_' + area, JSON.stringify(ordenesGuardadas));
+            
+            document.getElementById('orden-texto').value = '';
+            mostrarToast('Directiva enviada a ' + area.toUpperCase());
+        }
+
+        // S-STAFF: LEER ORDENES DEL LOCALSTORAGE
+        function cargarOrdenes(area) {
+            const contenedor = document.getElementById(area + '-ordenes');
+            const ordenesGuardadas = JSON.parse(localStorage.getItem('ordenes_' + area)) || [];
+            
+            if (ordenesGuardadas.length === 0) {
+                contenedor.innerHTML = '';
+                return;
             }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
+
+            let html = '<h3>Directivas de Jefatura</h3>';
+            // Mostrar las ordenes invertidas (la más nueva arriba)
+            ordenesGuardadas.reverse().forEach(orden => {
+                html += `
+                    <div class="orden-card">
+                        <div class="orden-fecha">Recibida: ${orden.fecha}</div>
+                        <strong>ORDEN:</strong> ${orden.texto}
+                    </div>`;
+            });
+            contenedor.innerHTML = html;
+        }
+
+        // UI: Mostrar Notificaciones
+        function mostrarToast(mensaje) {
+            const toast = document.getElementById('toast');
+            toast.innerText = mensaje;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
     </script>
 </body>
